@@ -23,7 +23,18 @@
             border-radius: 50%;
             text-align: center;
             line-height: 20px;
-            display: none; /* Caché par défaut */
+            display: none;
+        }
+
+        #notification-bell .dot {
+            position: absolute;
+            top: 5px;
+            right: 0px;
+            background: red;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: none;
         }
 
         #chat-box {
@@ -33,17 +44,6 @@
             overflow-y: auto;
             padding: 10px;
         }
-
-        #tooltip {
-            position: absolute;
-            background-color: black;
-            color: white;
-            padding: 5px;
-            border-radius: 4px;
-            display: none; /* Caché par défaut */
-            font-size: 12px;
-            white-space: nowrap;
-        }
     </style>
 </head>
 <body>
@@ -52,72 +52,55 @@
 <div id="notification-bell" title="Messages non lus">
     🔔
     <span class="counter" id="unread-count">0</span>
+    <span class="dot" id="notification-dot"></span>
 </div>
-<div id="tooltip"></div>
 
 <div id="chat-box"></div>
-<input type="text" id="message" placeholder="Entrez votre message..." />
+<input type="text" id="message" placeholder="Tapez votre message..." />
 <button onclick="sendMessage()">Envoyer</button>
 
 <script>
-   // const socket = new WebSocket('ws://localhost:8080');
     const socket = new WebSocket('ws://localhost:8080');
     let unreadMessages = [];
+
+    // Gérer les messages reçus
     socket.onmessage = function (event) {
         const chatBox = document.getElementById('chat-box');
         const newMessage = document.createElement('div');
         newMessage.textContent = event.data;
         chatBox.appendChild(newMessage);
         unreadMessages.push(event.data);
-        updateUnreadCount();
+        updateNotification();
     };
-
     function sendMessage() {
         const messageInput = document.getElementById('message');
         const message = messageInput.value;
-        socket.send(message);
-        messageInput.value = '';
-    }
 
-    function updateUnreadCount() {
+        if (message.trim()) {
+            socket.send(message);
+            messageInput.value = '';
+        }
+    }
+    function updateNotification() {
         const counter = document.getElementById('unread-count');
+        const dot = document.getElementById('notification-dot');
+
         if (unreadMessages.length > 0) {
             counter.textContent = unreadMessages.length;
             counter.style.display = 'block';
+            dot.style.display = 'block';
         } else {
             counter.style.display = 'none';
+            dot.style.display = 'none';
         }
-        updateTooltip();
     }
 
     document.getElementById('notification-bell').onclick = function () {
         if (unreadMessages.length > 0) {
-            alert('Messages non consultés');
+            alert('Messages non consultés : ' + unreadMessages.join(', '));
             unreadMessages = [];
-            updateUnreadCount();
+            updateNotification();
         }
-    };
-
-    function updateTooltip() {
-        const tooltip = document.getElementById('tooltip');
-        if (unreadMessages.length > 0) {
-            tooltip.textContent = 'Derniers messages : ' + unreadMessages.slice(0, 3).join(', ');
-            tooltip.style.display = 'block';
-        } else {
-            tooltip.style.display = 'none';
-        }
-    }
-    const bell = document.getElementById('notification-bell');
-    bell.onmouseover = function (e) {
-        const tooltip = document.getElementById('tooltip');
-        tooltip.style.left = `${e.pageX + 10}px`;
-        tooltip.style.top = `${e.pageY + 10}px`;
-        tooltip.style.display = 'block';
-    };
-
-    bell.onmouseout = function () {
-        const tooltip = document.getElementById('tooltip');
-        tooltip.style.display = 'none';
     };
 </script>
 </body>
