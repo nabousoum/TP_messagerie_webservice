@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat en Temps Réel</title>
+</head>
+<body>
+<h1>Chat en Temps Réel</h1>
+<div id="chat-box" style="border: 1px solid black; width: 300px; height: 300px; overflow-y: auto; padding: 10px;">
+</div>
+<input type="text" id="message" placeholder="Entrez votre message..." />
+<button onclick="sendMessage()">Envoyer</button>
+
+<script>
+    // Connexion au WebSocket
+    const socket = new WebSocket('ws://localhost:8080');
+
+    // Gestion de la réception des messages
+    socket.onmessage = function(event) {
+        const chatBox = document.getElementById('chat-box'); // Récupère l'élément de la boîte de discussion
+        const newMessage = document.createElement('div'); // Crée un nouvel élément pour afficher le message
+        newMessage.textContent = event.data; // Affecte le contenu du message reçu
+        chatBox.appendChild(newMessage); // Ajoute le message à la boîte de discussion
+    };
+
+    // Gestion de l'envoi des messages
+    function sendMessage() {
+        const messageInput = document.getElementById('message'); // Récupère le champ de saisie
+        const message = messageInput.value; // Récupère le texte saisi par l'utilisateur
+        socket.send(message); // Envoie le message au serveur WebSocket
+        messageInput.value = ''; // Réinitialise le champ de saisie
+    }
+
+    // Gestion des erreurs
+    socket.onerror = function(error) {
+        console.error('WebSocket Erreur :', error); // Affiche les erreurs dans la console
+    };
+</script>
+</body>
+</html>
