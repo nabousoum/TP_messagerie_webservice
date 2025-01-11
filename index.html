@@ -12,28 +12,25 @@
 <button onclick="sendMessage()">Envoyer</button>
 
 <script>
-    // Connexion au WebSocket
     const socket = new WebSocket('ws://localhost:8080');
+  //  const socket = new WebSocket('ws://192.168.56.1:8080');
 
-    // Gestion de la réception des messages
     socket.onmessage = function(event) {
-        const chatBox = document.getElementById('chat-box'); // Récupère l'élément de la boîte de discussion
-        const newMessage = document.createElement('div'); // Crée un nouvel élément pour afficher le message
-        newMessage.textContent = event.data; // Affecte le contenu du message reçu
-        chatBox.appendChild(newMessage); // Ajoute le message à la boîte de discussion
+        const chatBox = document.getElementById('chat-box');
+        const newMessage = document.createElement('div');
+        newMessage.textContent = event.data;
+        chatBox.appendChild(newMessage);
     };
 
-    // Gestion de l'envoi des messages
     function sendMessage() {
-        const messageInput = document.getElementById('message'); // Récupère le champ de saisie
-        const message = messageInput.value; // Récupère le texte saisi par l'utilisateur
-        socket.send(message); // Envoie le message au serveur WebSocket
-        messageInput.value = ''; // Réinitialise le champ de saisie
+        const messageInput = document.getElementById('message');
+        const message = messageInput.value;
+        socket.send(message);
+        messageInput.value = '';
     }
 
-    // Gestion des erreurs
     socket.onerror = function(error) {
-        console.error('WebSocket Erreur :', error); // Affiche les erreurs dans la console
+        console.error('WebSocket Erreur :', error);
     };
 </script>
 </body>

@@ -8,10 +8,9 @@ server.on('connection', (socket) => {
     socket.on('message', (message) => {
         console.log('Message reçu :', message);
 
-        // Diffuser le message à tous les clients sous forme de texte
         server.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
-                client.send(message.toString()); // Conversion explicite en texte
+                client.send(message.toString());
             }
         });
     });
